@@ -25,8 +25,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Flux<Product> getAllProducts() {
         return repository.findAll()
-                .timeout(TIMEOUT)
-                .onErrorResume(e -> Flux.empty());
+                .timeout(TIMEOUT);
     }
     
     @Override

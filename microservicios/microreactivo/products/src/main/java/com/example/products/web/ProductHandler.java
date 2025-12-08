@@ -28,7 +28,9 @@ public class ProductHandler {
     public Mono<ServerResponse> all(ServerRequest request) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(productService.getAllProducts(), Product.class);
+                .body(productService.getAllProducts(), Product.class)
+                .onErrorResume(e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .bodyValue(new ErrorResponse("An error occurred while retrieving products")));
     }
     
     public Mono<ServerResponse> byId(ServerRequest request) {
