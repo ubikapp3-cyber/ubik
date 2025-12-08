@@ -6,11 +6,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 🔹 Herencia del POM padre -->
+    <!-- 🔹 Herencia del POM padre de Spring Boot -->
     <parent>
-        <groupId>com.example</groupId>
-        <artifactId>microreactivo-2025</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.ubik</groupId>
@@ -21,6 +22,8 @@
 
     <properties>
         <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>

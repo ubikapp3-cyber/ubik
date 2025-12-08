@@ -1,5 +1,7 @@
 package com.ubik.usermanagement.infrastructure.adapter.in.web.dto;
 
+import java.util.List;
+
 /**
  * DTO de respuesta para Room
  */
@@ -10,6 +12,7 @@ public record RoomResponse(
         String roomType,
         Double price,
         String description,
-        Boolean isAvailable
+        Boolean isAvailable,
+        List<String> imageUrls
 ) {
 }
