@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 @Service
 public class ReservationService implements ReservationUseCasePort {
 
+    // Constantes de configuración para validaciones
+    private static final int CHECK_IN_GRACE_PERIOD_MINUTES = 5;
+    private static final int MAX_ADVANCE_BOOKING_YEARS = 1;
+
     private final ReservationRepositoryPort reservationRepositoryPort;
     private final RoomRepositoryPort roomRepositoryPort;
 
@@ -236,14 +240,14 @@ public class ReservationService implements ReservationUseCasePort {
                     "La fecha de check-in debe ser anterior a la fecha de check-out"));
         }
         LocalDateTime now = LocalDateTime.now();
-        if (reservation.checkInDate().isBefore(now.minusMinutes(5))) {
+        if (reservation.checkInDate().isBefore(now.minusMinutes(CHECK_IN_GRACE_PERIOD_MINUTES))) {
             return Mono.error(new ValidationException(
                     "La fecha de check-in no puede ser en el pasado"));
         }
-        // Validar que la reserva no sea demasiado lejos en el futuro (máximo 1 año)
-        if (reservation.checkInDate().isAfter(now.plusYears(1))) {
+        // Validar que la reserva no sea demasiado lejos en el futuro
+        if (reservation.checkInDate().isAfter(now.plusYears(MAX_ADVANCE_BOOKING_YEARS))) {
             return Mono.error(new ValidationException(
-                    "No se pueden hacer reservas con más de un año de anticipación"));
+                    "No se pueden hacer reservas con más de " + MAX_ADVANCE_BOOKING_YEARS + " año(s) de anticipación"));
         }
         if (reservation.totalPrice() == null || reservation.totalPrice() <= 0) {
             return Mono.error(new ValidationException("El precio total debe ser mayor que cero"));
