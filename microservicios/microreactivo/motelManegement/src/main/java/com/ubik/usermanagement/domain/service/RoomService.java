@@ -1,5 +1,7 @@
 package com.ubik.usermanagement.domain.service;
 
+import com.ubik.usermanagement.domain.exception.ResourceNotFoundException;
+import com.ubik.usermanagement.domain.exception.ValidationException;
 import com.ubik.usermanagement.domain.model.Room;
 import com.ubik.usermanagement.domain.port.in.RoomUseCasePort;
 import com.ubik.usermanagement.domain.port.out.MotelRepositoryPort;
@@ -29,7 +31,7 @@ public class RoomService implements RoomUseCasePort {
         return motelRepositoryPort.existsById(room.motelId())
                 .flatMap(exists -> {
                     if (!exists) {
-                        return Mono.error(new RuntimeException("Motel no encontrado con ID: " + room.motelId()));
+                        return Mono.error(new ResourceNotFoundException("Motel", room.motelId()));
                     }
                     return validateRoom(room)
                             .then(roomRepositoryPort.save(room));
@@ -39,7 +41,7 @@ public class RoomService implements RoomUseCasePort {
     @Override
     public Mono<Room> getRoomById(Long id) {
         return roomRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Habitación no encontrada con ID: " + id)));
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Habitación", id)));
     }
 
     @Override
@@ -60,7 +62,7 @@ public class RoomService implements RoomUseCasePort {
     @Override
     public Mono<Room> updateRoom(Long id, Room room) {
         return roomRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Habitación no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Habitación", id)))
                 .flatMap(existingRoom -> {
                     Room updatedRoom = new Room(
                             id,
@@ -82,7 +84,7 @@ public class RoomService implements RoomUseCasePort {
         return roomRepositoryPort.existsById(id)
                 .flatMap(exists -> {
                     if (!exists) {
-                        return Mono.error(new RuntimeException("Habitación no encontrada con ID: " + id));
+                        return Mono.error(new ResourceNotFoundException("Habitación", id));
                     }
                     return roomRepositoryPort.deleteById(id);
                 });
@@ -93,16 +95,16 @@ public class RoomService implements RoomUseCasePort {
      */
     private Mono<Void> validateRoom(Room room) {
         if (room.number() == null || room.number().trim().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("El número de habitación es requerido"));
+            return Mono.error(new ValidationException("El número de habitación es requerido"));
         }
         if (room.roomType() == null || room.roomType().trim().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("El tipo de habitación es requerido"));
+            return Mono.error(new ValidationException("El tipo de habitación es requerido"));
         }
         if (room.price() == null || room.price() <= 0) {
-            return Mono.error(new IllegalArgumentException("El precio debe ser mayor que cero"));
+            return Mono.error(new ValidationException("El precio debe ser mayor que cero"));
         }
         if (room.imageUrls() != null && room.imageUrls().size() > 15) {
-            return Mono.error(new IllegalArgumentException("No se pueden agregar más de 15 imágenes"));
+            return Mono.error(new ValidationException("No se pueden agregar más de 15 imágenes"));
         }
         return Mono.empty();
     }

@@ -26,7 +26,8 @@ public class RoomDtoMapper {
                 request.roomType(),
                 request.price(),
                 request.description(),
-                true // Por defecto disponible
+                true, // Por defecto disponible
+                null // Sin imágenes inicialmente
         );
     }
 
@@ -44,7 +45,8 @@ public class RoomDtoMapper {
                 request.roomType(),
                 request.price(),
                 request.description(),
-                request.isAvailable()
+                request.isAvailable(),
+                null // Se mantendrán las existentes
         );
     }
 
@@ -62,7 +64,8 @@ public class RoomDtoMapper {
                 room.roomType(),
                 room.price(),
                 room.description(),
-                room.isAvailable()
+                room.isAvailable(),
+                room.imageUrls()
         );
     }
 }

@@ -1,5 +1,8 @@
 package com.ubik.usermanagement.domain.service;
 
+import com.ubik.usermanagement.domain.exception.BusinessRuleException;
+import com.ubik.usermanagement.domain.exception.ResourceNotFoundException;
+import com.ubik.usermanagement.domain.exception.ValidationException;
 import com.ubik.usermanagement.domain.model.Service;
 import com.ubik.usermanagement.domain.port.in.ServiceUseCasePort;
 import com.ubik.usermanagement.domain.port.out.RoomRepositoryPort;
@@ -28,7 +31,7 @@ public class ServiceService implements ServiceUseCasePort {
                 .then(serviceRepositoryPort.existsByName(service.name()))
                 .flatMap(exists -> {
                     if (exists) {
-                        return Mono.error(new IllegalArgumentException("Ya existe un servicio con el nombre: " + service.name()));
+                        return Mono.error(new BusinessRuleException("Ya existe un servicio con el nombre: " + service.name()));
                     }
                     return serviceRepositoryPort.save(service);
                 });
@@ -37,7 +40,7 @@ public class ServiceService implements ServiceUseCasePort {
     @Override
     public Mono<Service> getServiceById(Long id) {
         return serviceRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Servicio no encontrado con ID: " + id)));
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Servicio", id)));
     }
 
     @Override
@@ -47,21 +50,24 @@ public class ServiceService implements ServiceUseCasePort {
 
     @Override
     public Mono<Service> getServiceByName(String name) {
-        return serviceRepositoryPort.findByName(name)
-                .switchIfEmpty(Mono.error(new RuntimeException("Servicio no encontrado con nombre: " + name)));
+        if (name == null || name.trim().isEmpty()) {
+            return Mono.error(new ValidationException("El nombre del servicio es requerido para la búsqueda"));
+        }
+        return serviceRepositoryPort.findByName(name.trim())
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Servicio no encontrado con nombre: " + name)));
     }
 
     @Override
     public Mono<Service> updateService(Long id, Service service) {
         return serviceRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Servicio no encontrado con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Servicio", id)))
                 .flatMap(existingService -> {
                     // Verificar si el nuevo nombre ya existe (excepto si es el mismo servicio)
                     if (!existingService.name().equals(service.name())) {
                         return serviceRepositoryPort.existsByName(service.name())
                                 .flatMap(exists -> {
                                     if (exists) {
-                                        return Mono.error(new IllegalArgumentException("Ya existe un servicio con el nombre: " + service.name()));
+                                        return Mono.error(new BusinessRuleException("Ya existe un servicio con el nombre: " + service.name()));
                                     }
                                     Service updatedService = new Service(
                                             id,
@@ -92,7 +98,7 @@ public class ServiceService implements ServiceUseCasePort {
         return serviceRepositoryPort.existsById(id)
                 .flatMap(exists -> {
                     if (!exists) {
-                        return Mono.error(new RuntimeException("Servicio no encontrado con ID: " + id));
+                        return Mono.error(new ResourceNotFoundException("Servicio", id));
                     }
                     return serviceRepositoryPort.deleteById(id);
                 });
@@ -109,21 +115,21 @@ public class ServiceService implements ServiceUseCasePort {
         return roomRepositoryPort.existsById(roomId)
                 .flatMap(roomExists -> {
                     if (!roomExists) {
-                        return Mono.error(new RuntimeException("Habitación no encontrada con ID: " + roomId));
+                        return Mono.error(new ResourceNotFoundException("Habitación", roomId));
                     }
                     // Validar que el servicio existe
                     return serviceRepositoryPort.existsById(serviceId);
                 })
                 .flatMap(serviceExists -> {
                     if (!serviceExists) {
-                        return Mono.error(new RuntimeException("Servicio no encontrado con ID: " + serviceId));
+                        return Mono.error(new ResourceNotFoundException("Servicio", serviceId));
                     }
                     // Verificar si la relación ya existe
                     return serviceRepositoryPort.existsRoomServiceRelation(roomId, serviceId);
                 })
                 .flatMap(relationExists -> {
                     if (relationExists) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "El servicio con ID " + serviceId + " ya está asociado a la habitación con ID " + roomId));
                     }
                     // Si todo está bien, crear la relación
@@ -141,16 +147,16 @@ public class ServiceService implements ServiceUseCasePort {
      */
     private Mono<Void> validateService(Service service) {
         if (service.name() == null || service.name().trim().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("El nombre del servicio es requerido"));
+            return Mono.error(new ValidationException("El nombre del servicio es requerido"));
         }
         if (service.name().length() > 50) {
-            return Mono.error(new IllegalArgumentException("El nombre del servicio no puede exceder 50 caracteres"));
+            return Mono.error(new ValidationException("El nombre del servicio no puede exceder 50 caracteres"));
         }
         if (service.description() != null && service.description().length() > 255) {
-            return Mono.error(new IllegalArgumentException("La descripción no puede exceder 255 caracteres"));
+            return Mono.error(new ValidationException("La descripción no puede exceder 255 caracteres"));
         }
         if (service.icon() != null && service.icon().length() > 50) {
-            return Mono.error(new IllegalArgumentException("El icono no puede exceder 50 caracteres"));
+            return Mono.error(new ValidationException("El icono no puede exceder 50 caracteres"));
         }
         return Mono.empty();
     }

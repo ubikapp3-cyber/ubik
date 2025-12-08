@@ -1,5 +1,8 @@
 package com.ubik.usermanagement.domain.service;
 
+import com.ubik.usermanagement.domain.exception.BusinessRuleException;
+import com.ubik.usermanagement.domain.exception.ResourceNotFoundException;
+import com.ubik.usermanagement.domain.exception.ValidationException;
 import com.ubik.usermanagement.domain.model.Reservation;
 import com.ubik.usermanagement.domain.port.in.ReservationUseCasePort;
 import com.ubik.usermanagement.domain.port.out.ReservationRepositoryPort;
@@ -16,6 +19,10 @@ import java.time.LocalDateTime;
  */
 @Service
 public class ReservationService implements ReservationUseCasePort {
+
+    // Constantes de configuración para validaciones
+    private static final int CHECK_IN_GRACE_PERIOD_MINUTES = 5;
+    private static final int MAX_ADVANCE_BOOKING_YEARS = 1;
 
     private final ReservationRepositoryPort reservationRepositoryPort;
     private final RoomRepositoryPort roomRepositoryPort;
@@ -34,13 +41,13 @@ public class ReservationService implements ReservationUseCasePort {
                 .then(roomRepositoryPort.existsById(reservation.roomId()))
                 .flatMap(roomExists -> {
                     if (!roomExists) {
-                        return Mono.error(new RuntimeException("Habitación no encontrada con ID: " + reservation.roomId()));
+                        return Mono.error(new ResourceNotFoundException("Habitación", reservation.roomId()));
                     }
                     return isRoomAvailable(reservation.roomId(), reservation.checkInDate(), reservation.checkOutDate());
                 })
                 .flatMap(isAvailable -> {
                     if (!isAvailable) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "La habitación no está disponible para las fechas seleccionadas"));
                     }
                     return reservationRepositoryPort.save(reservation);
@@ -50,7 +57,7 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Reservation> getReservationById(Long id) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)));
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)));
     }
 
     @Override
@@ -89,10 +96,10 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Reservation> updateReservation(Long id, Reservation reservation) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)))
                 .flatMap(existingReservation -> {
                     if (!existingReservation.canBeCancelled()) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "La reserva no puede ser modificada en su estado actual: " + existingReservation.status()));
                     }
 
@@ -106,7 +113,7 @@ public class ReservationService implements ReservationUseCasePort {
                                 reservation.checkOutDate())
                                 .flatMap(isAvailable -> {
                                     if (!isAvailable) {
-                                        return Mono.error(new IllegalArgumentException(
+                                        return Mono.error(new BusinessRuleException(
                                                 "La habitación no está disponible para las nuevas fechas"));
                                     }
                                     Reservation updatedReservation = new Reservation(
@@ -146,10 +153,10 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Reservation> confirmReservation(Long id) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)))
                 .flatMap(reservation -> {
                     if (!reservation.canBeConfirmed()) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "La reserva no puede ser confirmada en su estado actual: " + reservation.status()));
                     }
                     Reservation confirmedReservation = reservation.withStatus(Reservation.ReservationStatus.CONFIRMED);
@@ -160,10 +167,10 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Reservation> cancelReservation(Long id) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)))
                 .flatMap(reservation -> {
                     if (!reservation.canBeCancelled()) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "La reserva no puede ser cancelada en su estado actual: " + reservation.status()));
                     }
                     Reservation cancelledReservation = reservation.withStatus(Reservation.ReservationStatus.CANCELLED);
@@ -174,10 +181,10 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Reservation> checkIn(Long id) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)))
                 .flatMap(reservation -> {
                     if (!reservation.canCheckIn()) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "No se puede hacer check-in en el estado actual: " + reservation.status()));
                     }
                     Reservation checkedInReservation = reservation.withStatus(Reservation.ReservationStatus.CHECKED_IN);
@@ -188,10 +195,10 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Reservation> checkOut(Long id) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)))
                 .flatMap(reservation -> {
                     if (!reservation.canCheckOut()) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "No se puede hacer check-out en el estado actual: " + reservation.status()));
                     }
                     Reservation checkedOutReservation = reservation.withStatus(Reservation.ReservationStatus.CHECKED_OUT);
@@ -202,10 +209,10 @@ public class ReservationService implements ReservationUseCasePort {
     @Override
     public Mono<Void> deleteReservation(Long id) {
         return reservationRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Reserva no encontrada con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Reserva", id)))
                 .flatMap(reservation -> {
                     if (reservation.status() != Reservation.ReservationStatus.CANCELLED) {
-                        return Mono.error(new IllegalArgumentException(
+                        return Mono.error(new BusinessRuleException(
                                 "Solo se pueden eliminar reservas canceladas"));
                     }
                     return reservationRepositoryPort.deleteById(id);
@@ -217,27 +224,33 @@ public class ReservationService implements ReservationUseCasePort {
      */
     private Mono<Void> validateReservation(Reservation reservation) {
         if (reservation.roomId() == null) {
-            return Mono.error(new IllegalArgumentException("El ID de la habitación es requerido"));
+            return Mono.error(new ValidationException("El ID de la habitación es requerido"));
         }
         if (reservation.userId() == null) {
-            return Mono.error(new IllegalArgumentException("El ID del usuario es requerido"));
+            return Mono.error(new ValidationException("El ID del usuario es requerido"));
         }
         if (reservation.checkInDate() == null) {
-            return Mono.error(new IllegalArgumentException("La fecha de check-in es requerida"));
+            return Mono.error(new ValidationException("La fecha de check-in es requerida"));
         }
         if (reservation.checkOutDate() == null) {
-            return Mono.error(new IllegalArgumentException("La fecha de check-out es requerida"));
+            return Mono.error(new ValidationException("La fecha de check-out es requerida"));
         }
         if (reservation.checkInDate().isAfter(reservation.checkOutDate())) {
-            return Mono.error(new IllegalArgumentException(
+            return Mono.error(new ValidationException(
                     "La fecha de check-in debe ser anterior a la fecha de check-out"));
         }
-        if (reservation.checkInDate().isBefore(LocalDateTime.now())) {
-            return Mono.error(new IllegalArgumentException(
+        LocalDateTime now = LocalDateTime.now();
+        if (reservation.checkInDate().isBefore(now.minusMinutes(CHECK_IN_GRACE_PERIOD_MINUTES))) {
+            return Mono.error(new ValidationException(
                     "La fecha de check-in no puede ser en el pasado"));
         }
+        // Validar que la reserva no sea demasiado lejos en el futuro
+        if (reservation.checkInDate().isAfter(now.plusYears(MAX_ADVANCE_BOOKING_YEARS))) {
+            return Mono.error(new ValidationException(
+                    "No se pueden hacer reservas con más de " + MAX_ADVANCE_BOOKING_YEARS + " año(s) de anticipación"));
+        }
         if (reservation.totalPrice() == null || reservation.totalPrice() <= 0) {
-            return Mono.error(new IllegalArgumentException("El precio total debe ser mayor que cero"));
+            return Mono.error(new ValidationException("El precio total debe ser mayor que cero"));
         }
         return Mono.empty();
     }

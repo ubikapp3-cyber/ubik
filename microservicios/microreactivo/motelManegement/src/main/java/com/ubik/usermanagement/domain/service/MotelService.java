@@ -1,5 +1,7 @@
 package com.ubik.usermanagement.domain.service;
 
+import com.ubik.usermanagement.domain.exception.ResourceNotFoundException;
+import com.ubik.usermanagement.domain.exception.ValidationException;
 import com.ubik.usermanagement.domain.model.Motel;
 import com.ubik.usermanagement.domain.port.in.MotelUseCasePort;
 import com.ubik.usermanagement.domain.port.out.MotelRepositoryPort;
@@ -30,7 +32,7 @@ public class MotelService implements MotelUseCasePort {
     @Override
     public Mono<Motel> getMotelById(Long id) {
         return motelRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Motel no encontrado con ID: " + id)));
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Motel", id)));
     }
 
     @Override
@@ -40,13 +42,16 @@ public class MotelService implements MotelUseCasePort {
 
     @Override
     public Flux<Motel> getMotelsByCity(String city) {
-        return motelRepositoryPort.findByCity(city);
+        if (city == null || city.trim().isEmpty()) {
+            return Flux.error(new ValidationException("La ciudad es requerida para la búsqueda"));
+        }
+        return motelRepositoryPort.findByCity(city.trim());
     }
 
     @Override
     public Mono<Motel> updateMotel(Long id, Motel motel) {
         return motelRepositoryPort.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Motel no encontrado con ID: " + id)))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Motel", id)))
                 .flatMap(existingMotel -> {
                     Motel updatedMotel = new Motel(
                             id,
@@ -69,7 +74,7 @@ public class MotelService implements MotelUseCasePort {
         return motelRepositoryPort.existsById(id)
                 .flatMap(exists -> {
                     if (!exists) {
-                        return Mono.error(new RuntimeException("Motel no encontrado con ID: " + id));
+                        return Mono.error(new ResourceNotFoundException("Motel", id));
                     }
                     return motelRepositoryPort.deleteById(id);
                 });
@@ -80,16 +85,16 @@ public class MotelService implements MotelUseCasePort {
      */
     private Mono<Void> validateMotel(Motel motel) {
         if (motel.name() == null || motel.name().trim().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("El nombre del motel es requerido"));
+            return Mono.error(new ValidationException("El nombre del motel es requerido"));
         }
         if (motel.address() == null || motel.address().trim().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("La dirección del motel es requerida"));
+            return Mono.error(new ValidationException("La dirección del motel es requerida"));
         }
         if (motel.city() == null || motel.city().trim().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("La ciudad del motel es requerida"));
+            return Mono.error(new ValidationException("La ciudad del motel es requerida"));
         }
         if (motel.imageUrls() != null && motel.imageUrls().size() > 10) {
-            return Mono.error(new IllegalArgumentException("No se pueden agregar más de 10 imágenes"));
+            return Mono.error(new ValidationException("No se pueden agregar más de 10 imágenes"));
         }
         return Mono.empty();
     }

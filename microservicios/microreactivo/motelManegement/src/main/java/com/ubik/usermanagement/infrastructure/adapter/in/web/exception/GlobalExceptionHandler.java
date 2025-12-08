@@ -1,5 +1,8 @@
 package com.ubik.usermanagement.infrastructure.adapter.in.web.exception;
 
+import com.ubik.usermanagement.domain.exception.BusinessRuleException;
+import com.ubik.usermanagement.domain.exception.ResourceNotFoundException;
+import com.ubik.usermanagement.domain.exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -41,7 +44,52 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja IllegalArgumentException
+     * Maneja ValidationException (validaciones de negocio)
+     */
+    @ExceptionHandler(ValidationException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleValidationException(ValidationException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Error de validación",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return Mono.just(ResponseEntity.badRequest().body(errorResponse));
+    }
+
+    /**
+     * Maneja ResourceNotFoundException (recurso no encontrado)
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Recurso no encontrado",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse));
+    }
+
+    /**
+     * Maneja BusinessRuleException (reglas de negocio violadas)
+     */
+    @ExceptionHandler(BusinessRuleException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleBusinessRuleException(BusinessRuleException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Conflicto con regla de negocio",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse));
+    }
+
+    /**
+     * Maneja IllegalArgumentException (para compatibilidad con código existente)
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleIllegalArgumentException(IllegalArgumentException ex) {
@@ -56,22 +104,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja RuntimeException (ej: entidad no encontrada)
+     * Maneja RuntimeException (casos no capturados por otros handlers)
      */
     @ExceptionHandler(RuntimeException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleRuntimeException(RuntimeException ex) {
-        HttpStatus status = ex.getMessage().contains("no encontrado") 
-                ? HttpStatus.NOT_FOUND 
-                : HttpStatus.INTERNAL_SERVER_ERROR;
-
         ErrorResponse errorResponse = new ErrorResponse(
-                status.value(),
-                status.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Error interno",
                 ex.getMessage(),
                 LocalDateTime.now()
         );
 
-        return Mono.just(ResponseEntity.status(status).body(errorResponse));
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse));
     }
 
     /**
