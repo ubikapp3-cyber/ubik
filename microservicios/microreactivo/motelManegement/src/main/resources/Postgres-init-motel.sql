@@ -11,7 +11,10 @@
 -- psql -U postgres -d motel_management_db -f postgres-init-motel.sql
 
 -- Eliminar tablas si existen (para re-ejecución limpia)
+DROP TABLE IF EXISTS reservation CASCADE;
 DROP TABLE IF EXISTS room_service CASCADE;
+DROP TABLE IF EXISTS room_image CASCADE;
+DROP TABLE IF EXISTS motel_image CASCADE;
 DROP TABLE IF EXISTS service CASCADE;
 DROP TABLE IF EXISTS room CASCADE;
 DROP TABLE IF EXISTS motel CASCADE;
@@ -32,6 +35,20 @@ CREATE TABLE motel (
 CREATE INDEX idx_motel_city ON motel(city);
 CREATE INDEX idx_motel_property ON motel(property_id);
 
+-- Tabla de imágenes de moteles
+CREATE TABLE motel_image (
+                             id BIGSERIAL PRIMARY KEY,
+                             motel_id BIGINT NOT NULL,
+                             image_url VARCHAR(500) NOT NULL,
+                             display_order INTEGER NOT NULL DEFAULT 1,
+                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             FOREIGN KEY (motel_id) REFERENCES motel(id) ON DELETE CASCADE
+);
+
+-- Índices para motel_image
+CREATE INDEX idx_motel_image_motel ON motel_image(motel_id);
+CREATE INDEX idx_motel_image_order ON motel_image(motel_id, display_order);
+
 -- Tabla de habitaciones
 CREATE TABLE room (
                       id BIGSERIAL PRIMARY KEY,
@@ -48,6 +65,20 @@ CREATE TABLE room (
 -- Índices para room
 CREATE INDEX idx_room_motel ON room(motel_id);
 CREATE INDEX idx_room_available ON room(is_available);
+
+-- Tabla de imágenes de habitaciones
+CREATE TABLE room_image (
+                            id BIGSERIAL PRIMARY KEY,
+                            room_id BIGINT NOT NULL,
+                            image_url VARCHAR(500) NOT NULL,
+                            display_order INTEGER NOT NULL DEFAULT 1,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE
+);
+
+-- Índices para room_image
+CREATE INDEX idx_room_image_room ON room_image(room_id);
+CREATE INDEX idx_room_image_order ON room_image(room_id, display_order);
 
 -- Tabla de servicios
 CREATE TABLE service (
@@ -73,6 +104,29 @@ CREATE TABLE room_service (
 -- Índices para room_service
 CREATE INDEX idx_room_service_room ON room_service(room_id);
 CREATE INDEX idx_room_service_service ON room_service(service_id);
+
+-- Tabla de reservas
+CREATE TABLE reservation (
+                             id BIGSERIAL PRIMARY KEY,
+                             room_id BIGINT NOT NULL,
+                             user_id BIGINT NOT NULL,
+                             check_in_date TIMESTAMP NOT NULL,
+                             check_out_date TIMESTAMP NOT NULL,
+                             status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+                             total_price NUMERIC(10,2) NOT NULL,
+                             special_requests VARCHAR(500),
+                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE RESTRICT,
+                             CONSTRAINT check_dates CHECK (check_in_date < check_out_date),
+                             CONSTRAINT check_status CHECK (status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT', 'CANCELLED'))
+);
+
+-- Índices para reservation
+CREATE INDEX idx_reservation_room ON reservation(room_id);
+CREATE INDEX idx_reservation_user ON reservation(user_id);
+CREATE INDEX idx_reservation_status ON reservation(status);
+CREATE INDEX idx_reservation_dates ON reservation(check_in_date, check_out_date);
 
 -- Insertar servicios predefinidos
 INSERT INTO service (name, description, icon) VALUES
