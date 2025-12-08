@@ -7,7 +7,6 @@
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/dto/CreateMotelRequest.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/port/in/ReservationUseCasePort.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/model/Room.java
-/home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/ReservationPersistenceAdapter.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/MotelPersistenceAdapter.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/exception/BusinessRuleException.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/entity/MotelEntity.java
@@ -32,13 +31,11 @@
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/entity/ServiceEntity.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/dto/RoomResponse.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/dto/MotelResponse.java
-/home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/repository/ReservationR2dbcRepository.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/port/out/MotelRepositoryPort.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/dto/UpdateRoomRequest.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/port/out/RoomRepositoryPort.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/controller/ServiceController.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/dto/ServiceResponse.java
-/home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/mapper/ReservationMapper.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/exception/MotelManagementException.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/port/in/ServiceUseCasePort.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/repository/RoomR2dbcRepository.java
@@ -53,7 +50,6 @@
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/RoomPersistenceAdapter.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/exception/GlobalExceptionHandler.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/ServicePersistenceAdapter.java
-/home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/entity/ReservationEntity.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/in/web/controller/ReservationController.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/infrastructure/adapter/out/persistence/mapper/ServiceMapper.java
 /home/runner/work/ubik/ubik/microservicios/microreactivo/motelManegement/src/main/java/com/ubik/usermanagement/domain/exception/ResourceNotFoundException.java

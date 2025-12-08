@@ -26,7 +26,7 @@ public class MotelService implements MotelUseCasePort {
     public Mono<Motel> createMotel(Motel motel) {
         // Validaciones de negocio
         return validateMotel(motel)
-                .then(motelRepositoryPort.save(motel));
+                .then(Mono.defer(() -> motelRepositoryPort.save(motel)));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MotelService implements MotelUseCasePort {
                             motel.imageUrls()
                     );
                     return validateMotel(updatedMotel)
-                            .then(motelRepositoryPort.update(updatedMotel));
+                            .then(Mono.defer(() -> motelRepositoryPort.update(updatedMotel)));
                 });
     }
 

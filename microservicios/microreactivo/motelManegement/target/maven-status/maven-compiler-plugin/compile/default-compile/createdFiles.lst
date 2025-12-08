@@ -9,7 +9,6 @@ com/ubik/usermanagement/domain/service/RoomService.class
 com/ubik/usermanagement/MotelManagementApplication.class
 com/ubik/usermanagement/infrastructure/adapter/in/web/mapper/MotelDtoMapper.class
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/repository/ServiceR2dbcRepository.class
-com/ubik/usermanagement/infrastructure/adapter/out/persistence/repository/ReservationR2dbcRepository.class
 com/ubik/usermanagement/domain/exception/ValidationException.class
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/repository/MotelR2dbcRepository.class
 com/ubik/usermanagement/domain/port/out/ServiceRepositoryPort.class
@@ -20,7 +19,6 @@ com/ubik/usermanagement/infrastructure/adapter/out/persistence/ServicePersistenc
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/RoomPersistenceAdapter.class
 com/ubik/usermanagement/domain/service/ServiceService.class
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/repository/MotelImageR2dbcRepository.class
-com/ubik/usermanagement/infrastructure/adapter/out/persistence/mapper/ReservationMapper.class
 com/ubik/usermanagement/infrastructure/adapter/in/web/dto/ReservationResponse.class
 com/ubik/usermanagement/infrastructure/adapter/in/web/dto/ServiceResponse.class
 com/ubik/usermanagement/infrastructure/adapter/in/web/dto/RoomResponse.class
@@ -42,11 +40,9 @@ com/ubik/usermanagement/infrastructure/adapter/out/persistence/entity/RoomServic
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/entity/RoomImageEntity.class
 com/ubik/usermanagement/domain/model/Service.class
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/mapper/ServiceMapper.class
-com/ubik/usermanagement/infrastructure/adapter/out/persistence/ReservationPersistenceAdapter.class
 com/ubik/usermanagement/domain/service/ReservationService.class
 com/ubik/usermanagement/domain/exception/MotelManagementException.class
 com/ubik/usermanagement/infrastructure/adapter/in/web/controller/MotelController.class
-com/ubik/usermanagement/infrastructure/adapter/out/persistence/entity/ReservationEntity.class
 com/ubik/usermanagement/domain/port/in/RoomUseCasePort.class
 com/ubik/usermanagement/infrastructure/adapter/in/web/dto/UpdateReservationRequest.class
 com/ubik/usermanagement/infrastructure/adapter/out/persistence/mapper/RoomMapper.class
