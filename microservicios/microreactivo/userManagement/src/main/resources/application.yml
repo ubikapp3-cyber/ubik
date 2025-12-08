@@ -20,5 +20,8 @@ spring:
       strength: 12  # Fuerza del hash para contraseñas
 
 jwt:
+  # SECURITY WARNING: Secret should be externalized to environment variable
+  # Use: secret: ${JWT_SECRET:defaultForDev}
+  # Never commit production secrets to version control
   secret: mySecretKey1234567890abcdef1234567890abcdef
   expiration: 86400000 # 1 día en milisegundos
