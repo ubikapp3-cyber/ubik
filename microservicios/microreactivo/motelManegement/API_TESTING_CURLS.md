@@ -252,7 +252,7 @@ curl -X DELETE http://localhost:8084/api/rooms/4 \
 
 ## 📅 RESERVATION (Reservas) - Operaciones CRUD
 
-> **⚠️ NOTA IMPORTANTE sobre fechas:** Las fechas en los ejemplos de reservas (2025-12-15, etc.) son para demostración. 
+> **⚠️ NOTA IMPORTANTE sobre fechas:** Las fechas en los ejemplos de reservas (2026-01-15, etc.) son para demostración. 
 > Para pruebas reales, actualice las fechas a valores futuros según la fecha actual, ya que el sistema valida que 
 > las fechas de check-in y check-out deben estar en el futuro. Use el formato ISO 8601: `YYYY-MM-DDTHH:mm:ss`
 
@@ -264,8 +264,8 @@ curl -X POST http://localhost:8084/api/reservations \
   -d '{
     "roomId": 1,
     "userId": 100,
-    "checkInDate": "2025-12-15T14:00:00",
-    "checkOutDate": "2025-12-17T12:00:00",
+    "checkInDate": "2026-01-15T14:00:00",
+    "checkOutDate": "2026-01-17T12:00:00",
     "totalPrice": 100.00,
     "specialRequests": "Cama extra y desayuno incluido"
   }'
@@ -279,8 +279,8 @@ curl -X POST http://localhost:8084/api/reservations \
   -d '{
     "roomId": 3,
     "userId": 101,
-    "checkInDate": "2025-12-20T15:00:00",
-    "checkOutDate": "2025-12-25T11:00:00",
+    "checkInDate": "2026-01-20T15:00:00",
+    "checkOutDate": "2026-01-25T11:00:00",
     "totalPrice": 750.00,
     "specialRequests": "Luna de miel - decoración romántica"
   }'
@@ -294,8 +294,8 @@ curl -X POST http://localhost:8084/api/reservations \
   -d '{
     "roomId": 2,
     "userId": 100,
-    "checkInDate": "2025-12-28T14:00:00",
-    "checkOutDate": "2025-12-30T12:00:00",
+    "checkInDate": "2026-01-28T14:00:00",
+    "checkOutDate": "2026-01-30T12:00:00",
     "totalPrice": 160.00,
     "specialRequests": "Vista al jardín"
   }'
@@ -361,7 +361,7 @@ curl -X GET http://localhost:8084/api/reservations/status/CANCELLED \
 ### 10. Verificar Disponibilidad de Habitación (GET)
 
 ```bash
-curl -X GET "http://localhost:8084/api/reservations/room/1/available?checkIn=2025-12-10T14:00:00&checkOut=2025-12-12T12:00:00" \
+curl -X GET "http://localhost:8084/api/reservations/room/1/available?checkIn=2026-01-10T14:00:00&checkOut=2026-01-12T12:00:00" \
   -H "Accept: application/json"
 ```
 
@@ -371,8 +371,8 @@ curl -X GET "http://localhost:8084/api/reservations/room/1/available?checkIn=202
 curl -X PUT http://localhost:8084/api/reservations/1 \
   -H "Content-Type: application/json" \
   -d '{
-    "checkInDate": "2025-12-16T14:00:00",
-    "checkOutDate": "2025-12-18T12:00:00",
+    "checkInDate": "2026-01-16T14:00:00",
+    "checkOutDate": "2026-01-18T12:00:00",
     "totalPrice": 110.00,
     "specialRequests": "Cama extra, desayuno incluido y late check-out"
   }'
