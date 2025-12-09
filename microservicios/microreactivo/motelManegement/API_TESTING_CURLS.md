@@ -252,6 +252,10 @@ curl -X DELETE http://localhost:8084/api/rooms/4 \
 
 ## 📅 RESERVATION (Reservas) - Operaciones CRUD
 
+> **⚠️ NOTA IMPORTANTE sobre fechas:** Las fechas en los ejemplos de reservas (2025-12-15, etc.) son para demostración. 
+> Para pruebas reales, actualice las fechas a valores futuros según la fecha actual, ya que el sistema valida que 
+> las fechas de check-in y check-out deben estar en el futuro. Use el formato ISO 8601: `YYYY-MM-DDTHH:mm:ss`
+
 ### 1. Crear Reserva (POST)
 
 ```bash
@@ -478,18 +482,22 @@ curl -X DELETE http://localhost:8084/api/reservations/3 \
 ### Validaciones a Tener en Cuenta:
 
 1. **Motel:**
-   - El nombre debe tener entre 3 y 100 caracteres
-   - La ciudad es requerida
-   - Máximo 10 imágenes permitidas
+   - Campo `name` (nombre): debe tener entre 3 y 100 caracteres
+   - Campo `city` (ciudad): es requerido, máximo 100 caracteres
+   - Campo `address` (dirección): es requerido, máximo 255 caracteres
+   - Campo `imageUrls`: máximo 10 imágenes permitidas
 
 2. **Room:**
-   - El motelId debe existir antes de crear la habitación
-   - El precio debe ser mayor que cero
-   - Máximo 15 imágenes permitidas
+   - Campo `motelId`: debe existir antes de crear la habitación
+   - Campo `price` (precio): debe ser mayor que cero
+   - Campo `roomType` (tipo): es requerido, máximo 50 caracteres
+   - Campo `number` (número): es requerido, máximo 20 caracteres
+   - Campo `imageUrls`: máximo 15 imágenes permitidas
 
 3. **Reservation:**
-   - Las fechas de check-in y check-out deben estar en el futuro
+   - Campos `checkInDate` y `checkOutDate`: deben estar en el futuro (formato ISO 8601)
    - El check-out debe ser después del check-in
+   - Campo `totalPrice`: debe ser mayor que cero
    - Solo se pueden eliminar reservas canceladas
    - Transiciones de estado válidas:
      - PENDING → CONFIRMED → CHECKED_IN → CHECKED_OUT → COMPLETED
