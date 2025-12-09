@@ -34,7 +34,7 @@ public class RoomService implements RoomUseCasePort {
                         return Mono.error(new ResourceNotFoundException("Motel", room.motelId()));
                     }
                     return validateRoom(room)
-                            .then(roomRepositoryPort.save(room));
+                            .then(Mono.defer(() -> roomRepositoryPort.save(room)));
                 });
     }
 
@@ -75,7 +75,7 @@ public class RoomService implements RoomUseCasePort {
                             room.imageUrls()
                     );
                     return validateRoom(updatedRoom)
-                            .then(roomRepositoryPort.update(updatedRoom));
+                            .then(Mono.defer(() -> roomRepositoryPort.update(updatedRoom)));
                 });
     }
 

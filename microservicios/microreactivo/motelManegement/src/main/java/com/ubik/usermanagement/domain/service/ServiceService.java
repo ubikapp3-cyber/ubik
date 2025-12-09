@@ -28,7 +28,7 @@ public class ServiceService implements ServiceUseCasePort {
     @Override
     public Mono<Service> createService(Service service) {
         return validateService(service)
-                .then(serviceRepositoryPort.existsByName(service.name()))
+                .then(Mono.defer(() -> serviceRepositoryPort.existsByName(service.name())))
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new BusinessRuleException("Ya existe un servicio con el nombre: " + service.name()));
@@ -77,7 +77,7 @@ public class ServiceService implements ServiceUseCasePort {
                                             existingService.createdAt() // Mantener la fecha de creación original
                                     );
                                     return validateService(updatedService)
-                                            .then(serviceRepositoryPort.update(updatedService));
+                                            .then(Mono.defer(() -> serviceRepositoryPort.update(updatedService)));
                                 });
                     } else {
                         Service updatedService = new Service(
@@ -88,7 +88,7 @@ public class ServiceService implements ServiceUseCasePort {
                                 existingService.createdAt()
                         );
                         return validateService(updatedService)
-                                .then(serviceRepositoryPort.update(updatedService));
+                                .then(Mono.defer(() -> serviceRepositoryPort.update(updatedService)));
                     }
                 });
     }
